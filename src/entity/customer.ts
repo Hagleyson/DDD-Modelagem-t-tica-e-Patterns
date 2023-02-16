@@ -14,7 +14,7 @@ import Address from "./address";
       --customer.ts (get,set)
 
  */
-class Customer {
+export default class Customer {
   _id: string;
   _name: string;
   _address!: Address;
