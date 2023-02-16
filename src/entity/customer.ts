@@ -1,4 +1,7 @@
 //Entidade focado em negocio já o ORM usa entidade focada em Persistência(model)
+
+import Address from "./address";
+
 /**
   Complexidade de negocio 
   Domain
@@ -14,7 +17,7 @@
 class Customer {
   _id: string;
   _name: string;
-  _address: string;
+  _address!: Address;
   _active: boolean = true;
 
   constructor(id: string, name: string) {
@@ -38,10 +41,14 @@ class Customer {
   }
 
   activate() {
-    if (this._address.length === 0) {
+    if (this._address === undefined) {
       throw new Error("Address is mandatory to activate a customer");
     }
     this._active = true;
+  }
+
+  set Address(address: Address) {
+    this._address = address;
   }
 
   deactivate() {
