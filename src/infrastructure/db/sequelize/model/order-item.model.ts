@@ -2,7 +2,6 @@ import {
   BelongsTo,
   Column,
   ForeignKey,
-  HasMany,
   Model,
   PrimaryKey,
   Table,
@@ -22,14 +21,14 @@ export default class OrderItemModel extends Model {
 
   @ForeignKey(() => ProductModel)
   @Column({ allowNull: false })
-  declare product_id: number;
+  declare product_id: string;
 
   @BelongsTo(() => ProductModel)
   declare customer: CustomerModel;
 
   @ForeignKey(() => OrderModel)
   @Column({ allowNull: false })
-  declare order_id: number;
+  declare order_id: string;
 
   @BelongsTo(() => OrderModel)
   declare order: OrderModel;

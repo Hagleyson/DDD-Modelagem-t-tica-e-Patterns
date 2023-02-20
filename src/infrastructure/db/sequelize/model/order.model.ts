@@ -1,18 +1,19 @@
 import {
-  BelongsTo,
-  Column,
-  ForeignKey,
-  HasMany,
+  Table,
   Model,
   PrimaryKey,
-  Table,
+  Column,
+  ForeignKey,
+  BelongsTo,
+  HasMany,
 } from "sequelize-typescript";
-import CustomerModel from "./customer.model";
+
 import OrderItemModel from "./order-item.model";
+import CustomerModel from "./customer.model";
 
 @Table({
   tableName: "orders",
-  timestamps: false, //create and update at
+  timestamps: false,
 })
 export default class OrderModel extends Model {
   @PrimaryKey
@@ -21,7 +22,7 @@ export default class OrderModel extends Model {
 
   @ForeignKey(() => CustomerModel)
   @Column({ allowNull: false })
-  declare customer_id: number;
+  declare customer_id: string;
 
   @BelongsTo(() => CustomerModel)
   declare customer: CustomerModel;

@@ -27,6 +27,10 @@ export default class Customer {
     this.validate();
   }
 
+  get Address(): Address {
+    return this._address;
+  }
+
   get id() {
     return this._id;
   }
