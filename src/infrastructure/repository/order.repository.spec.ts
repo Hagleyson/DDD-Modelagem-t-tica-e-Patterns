@@ -140,4 +140,55 @@ describe("Order repository test", () => {
       await orderRepository.find("123");
     }).rejects.toThrowError("There is not order for this id");
   });
+
+  it("should findAll one Order", async () => {
+    const customerRepository = new CustomerRepository();
+    const customer = new Customer("123", "Customer 1");
+    const address = new Address("Street 1", 1, "Zipcode 1", "City 1");
+    customer.changeAddress(address);
+    await customerRepository.create(customer);
+
+    const productRepository = new ProductRepository();
+    const product = new Product("123", "Product 1", 10);
+
+    await productRepository.create(product);
+
+    const ordemItem = new OrderItem(
+      "1",
+      product.name,
+      product.price,
+      product.id,
+      2
+    );
+
+    const order = new Order("123", "123", [ordemItem]);
+
+    const orderRepository = new OrderRepository();
+    await orderRepository.create(order);
+
+    const customer2 = new Customer("456", "Customer 1");
+    const address2 = new Address("Street 1", 10, "Zipcode 1", "City 1");
+    customer2.changeAddress(address2);
+    await customerRepository.create(customer2);
+
+    const product2 = new Product("456", "Product 1", 10);
+
+    await productRepository.create(product2);
+
+    const ordemItem2 = new OrderItem(
+      "456",
+      product.name,
+      product.price,
+      product.id,
+      2
+    );
+
+    const order2 = new Order("456", "456", [ordemItem2]);
+
+    await orderRepository.create(order2);
+
+    const foundOrders = await orderRepository.findAll();
+
+    expect(foundOrders).toStrictEqual([order, order2]);
+  });
 });
