@@ -27,7 +27,7 @@ export default class OrderRepository implements OrderRepositoryInterface {
   }
 
   async update(entity: Order): Promise<void> {
-    const transaction = await OrderModel.sequelize!.transaction();
+    const trx = await OrderModel.sequelize!.transaction();
     try {
       await OrderModel.update(
         {
@@ -39,30 +39,33 @@ export default class OrderRepository implements OrderRepositoryInterface {
           where: {
             id: entity.id,
           },
+          transaction: trx,
         }
       );
 
       await OrderItemModel.destroy({
         where: { order_id: entity.id },
+        transaction: trx,
       });
       for (const item of entity.items) {
-        console.log(item);
-        const x = await ProductModel.findAll();
-        console.log("x ", x);
-        await OrderItemModel.create({
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          product_id: item.productId,
-          quantity: item.quantity,
-          order_id: entity.id,
-        });
+        await ProductModel.findAll({ transaction: trx });
+
+        await OrderItemModel.create(
+          {
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            product_id: item.productId,
+            quantity: item.quantity,
+            order_id: entity.id,
+          },
+          { transaction: trx }
+        );
       }
 
-      transaction.commit();
+      await trx.commit();
     } catch (error) {
-      console.log(error);
-      transaction.rollback();
+      await trx.rollback();
       throw new Error("error in update order");
     }
   }
