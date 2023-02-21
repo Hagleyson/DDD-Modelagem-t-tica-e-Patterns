@@ -1,6 +1,7 @@
 import Order from "../../domain/entity/order";
 import OrderItem from "../../domain/entity/order_item";
 import OrderRepositoryInterface from "../../domain/repository/order-repository-interface";
+import { ProductModel } from "../db/sequelize/model";
 import OrderItemModel from "../db/sequelize/model/order-item.model";
 import OrderModel from "../db/sequelize/model/order.model";
 
@@ -26,7 +27,44 @@ export default class OrderRepository implements OrderRepositoryInterface {
   }
 
   async update(entity: Order): Promise<void> {
-    await OrderModel.findOne({ where: { id: entity.id } });
+    const transaction = await OrderModel.sequelize!.transaction();
+    try {
+      await OrderModel.update(
+        {
+          id: entity.id,
+          customer_id: entity.customerId,
+          total: entity.total(),
+        },
+        {
+          where: {
+            id: entity.id,
+          },
+        }
+      );
+
+      await OrderItemModel.destroy({
+        where: { order_id: entity.id },
+      });
+      for (const item of entity.items) {
+        console.log(item);
+        const x = await ProductModel.findAll();
+        console.log("x ", x);
+        await OrderItemModel.create({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          product_id: item.productId,
+          quantity: item.quantity,
+          order_id: entity.id,
+        });
+      }
+
+      transaction.commit();
+    } catch (error) {
+      console.log(error);
+      transaction.rollback();
+      throw new Error("error in update order");
+    }
   }
 
   async find(id: string): Promise<Order> {

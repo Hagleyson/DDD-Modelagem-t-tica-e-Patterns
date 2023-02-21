@@ -45,4 +45,7 @@ export default class Order {
   get items(): OrderItem[] {
     return this._items;
   }
+  removeItems() {
+    this._items = [];
+  }
 }
